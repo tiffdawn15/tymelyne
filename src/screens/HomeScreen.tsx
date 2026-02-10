@@ -14,7 +14,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, Question } from '../types';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -51,8 +51,8 @@ export default function HomeScreen({ navigation }: Props) {
     try {
       const answersJson = await AsyncStorage.getItem('userAnswers');
       if (answersJson) {
-        const answers = JSON.parse(answersJson);
-        const nameAnswer = answers.find((a: any) => a.id === 1);
+        const answers: Question[] = JSON.parse(answersJson);
+        const nameAnswer = answers.find((a) => a.id === 1);
         if (nameAnswer && nameAnswer.answer) {
           setUserName(nameAnswer.answer.split(' ')[0]);
         }
@@ -85,9 +85,10 @@ export default function HomeScreen({ navigation }: Props) {
   const sendMessage = () => {
     if (!message.trim()) return;
 
+    const currentMessage = message;
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message,
+      text: currentMessage,
       isUser: true,
       timestamp: new Date(),
     };
@@ -99,7 +100,7 @@ export default function HomeScreen({ navigation }: Props) {
     setTimeout(() => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateAIResponse(message),
+        text: generateAIResponse(currentMessage),
         isUser: false,
         timestamp: new Date(),
       };
